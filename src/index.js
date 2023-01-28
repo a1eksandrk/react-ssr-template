@@ -3,37 +3,48 @@ import fs from 'node:fs/promises'
 
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import express from 'express'
+
+import Fastify from 'fastify'
+import fastifyStatic from '@fastify/static'
 
 import App from '../client/App'
 
 const port = 3000
-const app = express()
+const fastify = Fastify({
+  logger: true
+})
 
-app.use(
-  express.static(
-    path.resolve(process.cwd(), 'public')
-  )
-)
+fastify.register(fastifyStatic, {
+  root: path.resolve(process.cwd(), 'public')
+})
 
-app.get('/', async (_, res) => {
+fastify.get('/', async (_, reply) => {
   try {
-    const data = await fs.readFile(
-      path.resolve(process.cwd(), 'src/index.html'), 'utf8'
+    const fileBuffer = await fs.readFile(
+      path.resolve(process.cwd(), 'src/index.html')
     )
 
-    return res.send(
-      data.replace(
+    const htmlPage = (
+      fileBuffer.toString('utf8').replace(
         '<div id="root"></div>',
         `<div id="root">${ReactDOMServer.renderToString(<App />)}</div>`
       )
     )
+
+    return reply.header('Content-Type', 'text/html').send(htmlPage)
   } catch (error) {
-    console.error(error)
-    return res.status(500).send('An error occurred')
+    fastify.log.error(error)
+    return reply.code(500).send('An error occurred')
   }
 })
 
-app.listen(port, () => {
-  console.log(`react-ssr-template app listening on port ${port}`)
-})
+const start = async () => {
+  try {
+    await fastify.listen({ port })
+  } catch (error) {
+    fastify.log.error(error)
+    process.exit(1)
+  }
+}
+
+start()
