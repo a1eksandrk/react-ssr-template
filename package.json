@@ -1,0 +1,20 @@
+{
+  "name": "react-ssr-template",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build:client": "esbuild ./client --bundle --minify --outfile=public/bundle.js",
+    "build:server": "esbuild ./src --bundle --minify --platform=node --packages=external --loader:.js=jsx --outfile=dist/server.js",
+    "watch:server": "nodemon ./dist/server.js localhost 3000"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "esbuild": "^0.17.5"
+  }
+}

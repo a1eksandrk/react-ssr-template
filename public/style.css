@@ -1,0 +1,14 @@
+.counter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.counter__label {
+    font-size: 20px;
+}
+
+.counter__toolbar {
+    display: flex;
+    gap: 4px;
+}
